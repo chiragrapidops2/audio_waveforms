@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../audio_waveforms.dart';
 import 'base/wave_clipper.dart';
+import 'base/highlight_bar_item.dart';
 import 'painters/player_wave_painter.dart';
 
 class AudioFileWaveforms extends StatefulWidget {
@@ -74,6 +75,9 @@ class AudioFileWaveforms extends StatefulWidget {
   /// Provides a callback when tapping on the waveform.
   final Function(TapUpDetails)? tapUpUpdateDetails;
 
+  final Map<int, Color> highlightColorMap;
+
+
   /// Generate waveforms from audio file. You play those audio file using
   /// [PlayerController].
   ///
@@ -102,6 +106,7 @@ class AudioFileWaveforms extends StatefulWidget {
     this.onDragEnd,
     this.dragUpdateDetails,
     this.tapUpUpdateDetails,
+    this.highlightColorMap = const {},
   });
 
   @override
@@ -241,6 +246,8 @@ class _AudioFileWaveformsState extends State<AudioFileWaveforms>
                     scrollScale: scrollScale,
                     waveformType: widget.waveformType,
                     cachedAudioProgress: _cachedAudioProgress,
+                    highlightBarMap: playerController.highlightBarMap,
+                    highlightColorMap: widget.highlightColorMap,
                   ),
                   size: widget.size,
                 );

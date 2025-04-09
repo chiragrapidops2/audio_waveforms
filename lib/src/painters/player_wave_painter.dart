@@ -13,6 +13,8 @@ class PlayerWavePainter extends CustomPainter {
   final double emptySpace;
   final double scrollScale;
   final WaveformType waveformType;
+  final Map<int, int> highlightBarMap;
+  final Map<int, Color> highlightColorMap;
 
   final PlayerWaveStyle playerWaveStyle;
 
@@ -28,11 +30,14 @@ class PlayerWavePainter extends CustomPainter {
     required this.waveformType,
     required this.cachedAudioProgress,
     required this.playerWaveStyle,
-  })  : fixedWavePaint = Paint()
-          ..color = playerWaveStyle.fixedWaveColor
-          ..strokeWidth = playerWaveStyle.waveThickness
-          ..strokeCap = playerWaveStyle.waveCap
-          ..shader = playerWaveStyle.fixedWaveGradient,
+    required this.highlightBarMap,
+    required this.highlightColorMap,
+  })
+      : fixedWavePaint = Paint()
+    ..color = playerWaveStyle.fixedWaveColor
+    ..strokeWidth = playerWaveStyle.waveThickness
+    ..strokeCap = playerWaveStyle.waveCap
+    ..shader = playerWaveStyle.fixedWaveGradient,
         liveWavePaint = Paint()
           ..color = playerWaveStyle.liveWaveColor
           ..strokeWidth = playerWaveStyle.waveThickness
@@ -92,11 +97,37 @@ class PlayerWavePainter extends CustomPainter {
 
       // Only draw waves which are in visible viewport.
       if (dx > 0 && dx < halfWidth * 2) {
-        canvas.drawLine(
-          Offset(dx, bottomDy),
-          Offset(dx, topDy),
-          i < audioProgress * length ? liveWavePaint : fixedWavePaint,
-        );
+        final highlightIndexSentiment = highlightBarMap[i];
+        // if (i >= 12.53 && i <= 14.74) {
+        final highlightColor = highlightIndexSentiment != null
+            ? highlightColorMap[highlightIndexSentiment]
+            : null;
+        if (highlightIndexSentiment != null && highlightColor != null) {
+          final fixedPaint = Paint()
+            ..color = highlightColor.withValues(alpha: 0.31)
+            ..strokeWidth = playerWaveStyle.waveThickness
+            ..strokeCap = playerWaveStyle.waveCap
+            ..shader = playerWaveStyle.fixedWaveGradient;
+
+          final livePaint = Paint()
+            ..color = highlightColor
+            ..strokeWidth = playerWaveStyle.waveThickness
+            ..strokeCap = playerWaveStyle.waveCap
+            ..shader = playerWaveStyle.liveWaveGradient;
+          canvas.drawLine(
+            Offset(dx, bottomDy),
+            Offset(dx, topDy),
+            i < audioProgress * length
+                ? livePaint
+                : fixedPaint,
+          );
+        } else {
+          canvas.drawLine(
+            Offset(dx, bottomDy),
+            Offset(dx, topDy),
+            i < audioProgress * length ? liveWavePaint : fixedWavePaint,
+          );
+        }
       }
     }
   }
