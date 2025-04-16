@@ -17,7 +17,6 @@ class PlayerController extends ChangeNotifier {
 
   List<HighlightBarItem> get highlightBarList => _highlightBarList;
 
-
   final Map<int, int> _highlightBarMap = {};
 
   Map<int, int> get highlightBarMap => _highlightBarMap;
@@ -165,7 +164,8 @@ class PlayerController extends ChangeNotifier {
       waveformExtraction
           .extractWaveformData(
         path: path,
-        noOfSamples: noOfSamples,
+        noOfSamples:
+            noOfSamples == -1 ? (_maxDuration / 1000).round() : noOfSamples,
       )
           .then(
         (value) {
@@ -174,7 +174,8 @@ class PlayerController extends ChangeNotifier {
             ..addAll(value);
 
           for (var element in highlightBarList) {
-            final startProgress = (element.startTime / maxDuration) * value.length;
+            final startProgress =
+                (element.startTime / maxDuration) * value.length;
             final endProgress = (element.endTime / maxDuration) * value.length;
 
             for (int i = startProgress.floor(); i <= endProgress.ceil(); i++) {
